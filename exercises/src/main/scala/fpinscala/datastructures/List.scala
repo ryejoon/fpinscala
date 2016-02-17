@@ -1,5 +1,7 @@
 package fpinscala.datastructures
 
+import scala.annotation.tailrec
+
 sealed trait List[+A] // `List` data type, parameterized on a type, `A`
 case object Nil extends List[Nothing] // A `List` data constructor representing the empty list
 /* Another data constructor, representing nonempty lists. Note that `tail` is another `List[A]`,
@@ -50,13 +52,34 @@ object List { // `List` companion object. Contains functions for creating and wo
     foldRight(ns, 1.0)(_ * _) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
 
 
-  def tail[A](l: List[A]): List[A] = sys.error("todo")
+  def tail[A](l: List[A]): List[A] = l match {
+    case Nil => Nil
+    case Cons(_, Nil) => l
+    case Cons(_, y) => y
+  }
 
-  def setHead[A](l: List[A], h: A): List[A] = sys.error("todo")
+  def setHead[A](l: List[A], h: A): List[A] = l match {
+    case Nil => List(h)
+    case Cons(_, y) => Cons(h, y)
+  }
 
-  def drop[A](l: List[A], n: Int): List[A] = sys.error("todo")
+  def drop[A](l: List[A], n: Int): List[A] = {
+    if (n < 0) return l
+    @tailrec
+    def loop(dropCount : Int, current: List[A]): List[A] = {
+      dropCount match {
+        case n => current
+        case _ => loop(dropCount + 1, List.tail(current))
+      }
+    }
+    loop(0, l)
+  }
 
-  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = sys.error("todo")
+  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = {
+    case Nil => Nil
+    case Cons(x : A, Nil) => if (f(x)) Nil else l
+    case Cons(x : A, y) => if (f(x)) dropWhile(y, f) else l
+  }
 
   def init[A](l: List[A]): List[A] = sys.error("todo")
 
