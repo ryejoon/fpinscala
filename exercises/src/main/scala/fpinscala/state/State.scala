@@ -39,13 +39,31 @@ object RNG {
     }
   }
 
-  def double(rng: RNG): (Double, RNG) = ???
+  def double(rng: RNG): (Double, RNG) = {
+    val (result, newRng) = rng.nextInt
+    result match {
+      case Int.MinValue => double(newRng)
+      case _ => (result / Int.MinValue.toDouble, newRng)
+    }
+  }
 
-  def intDouble(rng: RNG): ((Int,Double), RNG) = ???
+  def intDouble(rng: RNG): ((Int,Double), RNG) = {
+    val (intResult, newRng) = rng.nextInt
+    val (doubleResult, newRng2) = double(newRng)
+    ((intResult, doubleResult), newRng2)
+  }
 
-  def doubleInt(rng: RNG): ((Double,Int), RNG) = ???
+  def doubleInt(rng: RNG): ((Double,Int), RNG) = {
+    val ((i, d), rng2) = intDouble(rng)
+    ((d, i), rng2)
+  }
 
-  def double3(rng: RNG): ((Double,Double,Double), RNG) = ???
+  def double3(rng: RNG): ((Double,Double,Double), RNG) = {
+    val (d1, newRng1) = double(rng)
+    val (d2, newRng2) = double(newRng1)
+    val (d3, newRng3) = double(newRng2)
+    ((d1,d2,d3), newRng3)
+  }
 
   def ints(count: Int)(rng: RNG): (List[Int], RNG) = ???
 
