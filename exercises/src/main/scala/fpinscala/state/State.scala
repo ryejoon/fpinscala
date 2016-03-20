@@ -85,9 +85,22 @@ object RNG {
     intsInner(count, rng, Nil)
   }
 
-  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = ???
+  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = {
+    r => {
+      val aResult = ra(r)
+      val bResult = rb(aResult._2)
+      (f(aResult._1, bResult._1), bResult._2)
+    }
+  }
 
-  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = ???
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = {
+    def sequenceInner(remaining: List[Rand[A]], result : List[A], nextRNG : RNG) : (List[A], RNG) =
+      remaining match {
+        case Nil => (result, nextRNG)
+        case item :: l => sequenceInner(l, item(nextRNG)._1 :: result, item(nextRNG)._2)
+      }
+    rng => sequenceInner(fs, Nil, rng)
+  }
 
   def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = ???
 }
