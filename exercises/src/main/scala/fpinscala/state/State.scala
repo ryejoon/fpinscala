@@ -39,13 +39,25 @@ object RNG {
     }
   }
 
+  def nonMinInt(rng: RNG): (Int, RNG) = {
+    val (result, newRng) = rng.nextInt
+    result match {
+      case Int.MinValue => nonMinInt(newRng.nextInt._2)
+      case _ => (result, newRng)
+    }
+  }
+
   def double(rng: RNG): (Double, RNG) = {
+    map(nonMinInt)(x => x / Int.MinValue.toDouble)(rng)
+  }
+
+  /*def double(rng: RNG): (Double, RNG) = {
     val (result, newRng) = rng.nextInt
     result match {
       case Int.MinValue => double(newRng)
       case _ => (result / Int.MinValue.toDouble, newRng)
     }
-  }
+  }*/
 
   def intDouble(rng: RNG): ((Int,Double), RNG) = {
     val (intResult, newRng) = rng.nextInt
@@ -65,7 +77,13 @@ object RNG {
     ((d1,d2,d3), newRng3)
   }
 
-  def ints(count: Int)(rng: RNG): (List[Int], RNG) = ???
+  def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
+    def intsInner(c : Int, r : RNG, l : List[Int]): (List[Int], RNG) = c match {
+      case x if x <= 0 => (l, r)
+      case _ => intsInner(c - 1, r.nextInt._2, r.nextInt._1 :: l)
+    }
+    intsInner(count, rng, Nil)
+  }
 
   def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = ???
 

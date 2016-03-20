@@ -16,6 +16,7 @@ class RNG$Test extends FunSuite {
     println(RNG.double3(RNG.Simple(100)))
     println(RNG.doubleInt(RNG.Simple(100)))
     println(RNG.intDouble(RNG.Simple(100)))
+    println(RNG.ints(10)(RNG.Simple(100)))
     //assert()._1 >= 0)
   }
 
